@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_25",
   "client": [
     "SkyRendererMixin",
-    "SkyOverlayMixin"
+    "SkyOverlayMixin",
+    "IrisCelestialUniformsMixin"
   ],
   "injectors": {
     "defaultRequire": 1

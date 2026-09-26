@@ -15,7 +15,9 @@ dependencies {
     implementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
     implementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
     // Real calendar and daylight maths. Not bundled; installed alongside.
-    compileOnly(files("../gameoverse-sky-sync/build/libs/gameoverse-sky-sync-1.0.0.jar"))
+    compileOnly(files("../gameoverse-sky-sync/build/libs/gameoverse-sky-sync-1.1.0.jar"))
+    // Iris, for IrisCelestialUniformsMixin (the exact jar shipped to players).
+    compileOnly(files("libs/iris-fabric-1.11.3+mc26.1.2.jar"))
 }
 
 java {
