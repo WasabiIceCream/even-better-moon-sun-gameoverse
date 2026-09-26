@@ -24,7 +24,8 @@
     "fabricloader": ">=0.18.4",
     "minecraft": "~26.1",
     "java": ">=25",
-    "gameoverse_sky_sync": "*"
+    "gameoverse_sky_sync": "*",
+    "fabric-api": "*"
   },
   "license": "MIT"
 }

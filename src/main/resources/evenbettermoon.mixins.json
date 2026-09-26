@@ -4,8 +4,7 @@
   "compatibilityLevel": "JAVA_25",
   "client": [
     "SkyRendererMixin",
-    "SkyOverlayMixin",
-    "ChatCommandMixin"
+    "SkyOverlayMixin"
   ],
   "injectors": {
     "defaultRequire": 1

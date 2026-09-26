@@ -27,6 +27,9 @@ calendar instead, using `gameoverse-sky-sync` (required):
   now also turns off the harvest moon), since Enhanced Celestials runs the real
   Blood and Harvest Moon events here.
 - **`/year`**: fixed to the real calendar.
+- **Commands** (`/astro`, `/eclipse`, `/meteorshower`, `/aurora`, `/bloodmoon`,
+  `/year`) are real client commands with autocomplete; the original caught them by
+  intercepting chat, so the game showed them as unknown while typing.
 - Aurora animation uses game time instead of the large real-day tick value.
 
 - **Eclipses**: the original's 174-day timer (a black overlay over the whole screen,
