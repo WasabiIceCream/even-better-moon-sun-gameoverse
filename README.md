@@ -13,7 +13,7 @@ calendar instead, using `gameoverse-sky-sync` (required):
 - **Moon phase**: no override. Sky Sync already drives vanilla's moon phase from the
   real moon on both sides, so the sky matches server mechanics.
 - **Sun tilt**: the real solar declination for today.
-- **Year, seasons and the lunar day** for events, F3 and `/astro`: the real date,
+- **Year, seasons and the lunar day** for events and `/astro`: the real date,
   with the year starting at the March equinox. The time of day for night-only
   events is the world's, warped to today's daylight length like the sun.
 - **Blood moon and harvest moon tints**: off by default (`bloodMoonInterval: 0`
@@ -30,3 +30,8 @@ the equinoxes) keep their original intervals, counted in real days.
 Build `../gameoverse-sky-sync` first (compiled against its jar), then
 `./gradlew build`. Copy `build/libs/even-better-moon-sun-gameoverse-<version>.jar`
 to `fabric 26.1/automodpack/host-modpack/main/mods/` (client-only set).
+
+The original's F3 lines are dropped: its `DebugScreenMixin` targets
+`DebugScreenOverlay.getGameInformation`, which 26.1.2 no longer has (F3 moved to
+debug entries), and the failed injection crashed the client at startup. The
+original 1.6 jar crashes the same way on 26.1.2. `/astro` shows the same info.
