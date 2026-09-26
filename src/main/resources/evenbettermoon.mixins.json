@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "com.arnav.evenbettermoon.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "SkyRendererMixin",
+    "DebugScreenMixin",
+    "SkyOverlayMixin",
+    "ChatCommandMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

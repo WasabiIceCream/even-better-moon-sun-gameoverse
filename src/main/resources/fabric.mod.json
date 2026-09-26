@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "evenbettermoon",
+  "version": "1.6",
+  "name": "Even Better Moon and Sun",
+  "description": "Realistic lunar cycles (29-day) with all 8 moon phases, and a seasonal sun that shifts its path north/south across the sky throughout the year.",
+  "authors": [
+    "arnav"
+  ],
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.arnav.evenbettermoon.EvenBetterMoonSunClient"
+    ]
+  },
+  "mixins": [
+    {
+      "config": "evenbettermoon.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.18.4",
+    "minecraft": "~26.1",
+    "java": ">=25"
+  }
+}
