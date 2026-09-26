@@ -18,7 +18,7 @@ public abstract class SkyOverlayMixin {
    private void drawSkyOverlay(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
       Minecraft mc = Minecraft.getInstance();
       if (mc.level != null && mc.level.dimension().equals(Level.OVERWORLD)) {
-         long ticks = mc.level.getGameTime();
+         long ticks = com.arnav.evenbettermoon.SkyTime.ticks(mc.level);
          float meteorShower = SkyEventManager.meteorShowerProgress(ticks);
          if (meteorShower > 0.0F) {
             renderMeteors(graphics, ticks, meteorShower);
@@ -27,7 +27,7 @@ public abstract class SkyOverlayMixin {
          renderShootingStars(graphics, ticks);
          float aurora = SkyEventManager.auroraIntensity(ticks);
          if (aurora > 0.0F) {
-            renderAurora(graphics, ticks, aurora);
+            renderAurora(graphics, ticks, mc.level.getGameTime(), aurora);
          }
 
          float eclipse = SkyEventManager.eclipseProgress(ticks);
@@ -119,7 +119,7 @@ public abstract class SkyOverlayMixin {
       }
    }
 
-   private static void renderAurora(GuiGraphicsExtractor graphics, long ticks, float intensity) {
+   private static void renderAurora(GuiGraphicsExtractor graphics, long ticks, long animTicks, float intensity) {
       long day = ticks / 24000L;
       int W = graphics.guiWidth();
       int H = graphics.guiHeight();
@@ -137,9 +137,9 @@ public abstract class SkyOverlayMixin {
 
          for (int y = 0; y < curtainHeight; y += sliceHeight) {
             float rowFrac = (float)y / curtainHeight;
-            float wave = (float)Math.sin((float)ticks * waveSpeed + rowFrac * 6.0F + wavePhase) * bandWidth * 0.5F * (0.4F + rowFrac);
+            float wave = (float)Math.sin((float)(animTicks % 1000000L) * waveSpeed + rowFrac * 6.0F + wavePhase) * bandWidth * 0.5F * (0.4F + rowFrac);
             float x = bandCenterX + wave;
-            float shimmer = 0.7F + 0.3F * (float)Math.sin(ticks * 0.02 + rowFrac * 10.0F + band);
+            float shimmer = 0.7F + 0.3F * (float)Math.sin((animTicks % 1000000L) * 0.02 + rowFrac * 10.0F + band);
             float alpha = intensity * shimmer * (1.0F - rowFrac * 0.6F) * 0.55F;
             if (!(alpha <= 0.02F)) {
                int color = auroraColor(rowFrac, hueSeed);

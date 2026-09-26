@@ -36,7 +36,7 @@ public final class SkyEventManager {
          long day = totalTicks / 24000L;
          long tickOfDay = totalTicks % 24000L;
          if (interval < 0) {
-            int lunarDay = (int)(day % 29L);
+            int lunarDay = SkyTime.lunarDay();
             if (lunarDay < 14 || lunarDay > 15) {
                return 0.0F;
             }
@@ -78,11 +78,17 @@ public final class SkyEventManager {
    }
 
    public static float harvestMoonAlpha(long totalTicks) {
-      int yearLength = SkyEventConfig.get().yearLength;
+      // Gameoverse: bloodMoonInterval 0 also turns off the harvest moon tint, since
+      // Enhanced Celestials runs the real Blood and Harvest Moon events here.
+      if (SkyEventConfig.get().bloodMoonInterval == 0) {
+         return 0.0F;
+      }
+
+      int yearLength = 365;
       long day = totalTicks / 24000L;
       long tickOfDay = totalTicks % 24000L;
-      int dayOfYear = (int)(day % yearLength);
-      int lunarDay = (int)(day % 29L);
+      int dayOfYear = SkyTime.dayOfYear();
+      int lunarDay = SkyTime.lunarDay();
       if (lunarDay >= 14 && lunarDay <= 15) {
          int equinox = yearLength / 2;
          if (Math.abs(dayOfYear - equinox) > 21) {
@@ -108,7 +114,7 @@ public final class SkyEventManager {
       } else {
          long day = totalTicks / 24000L;
          if (interval < 0) {
-            int lunarDay = (int)(day % 29L);
+            int lunarDay = SkyTime.lunarDay();
             if (lunarDay >= 14 && lunarDay <= 15) {
                return 0;
             } else {
@@ -151,8 +157,8 @@ public final class SkyEventManager {
          long day = totalTicks / 24000L;
          long tickOfDay = totalTicks % 24000L;
          if (tickOfDay >= 13000L && tickOfDay < 23000L) {
-            int yearLength = SkyEventConfig.get().yearLength;
-            int dayOfYear = (int)(day % yearLength);
+            int yearLength = 365;
+            int dayOfYear = SkyTime.dayOfYear();
             float seasonalWeight = equinoxWeight(dayOfYear, yearLength);
             if (seasonalWeight <= 0.0F) {
                return 0.0F;
@@ -183,8 +189,8 @@ public final class SkyEventManager {
          return false;
       } else {
          long day = totalTicks / 24000L;
-         int yearLength = SkyEventConfig.get().yearLength;
-         int dayOfYear = (int)(day % yearLength);
+         int yearLength = 365;
+         int dayOfYear = SkyTime.dayOfYear();
          float seasonalWeight = equinoxWeight(dayOfYear, yearLength);
          if (seasonalWeight <= 0.0F) {
             return false;

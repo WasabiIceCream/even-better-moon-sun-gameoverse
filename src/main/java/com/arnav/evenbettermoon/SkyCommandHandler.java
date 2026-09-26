@@ -128,35 +128,8 @@ public final class SkyCommandHandler {
    }
 
    private static List<String> year(String[] p) {
-      if (p.length < 2) {
-         return List.of("[Even Better Moon & Sun] Usage: /year set <days>  |  /year reset");
-      } else {
-         SkyEventConfig cfg = SkyEventConfig.get();
-         if (p[1].equalsIgnoreCase("reset")) {
-            cfg.yearLength = 365;
-            cfg.save();
-            return List.of("[Even Better Moon & Sun] Year length reset to 365 days (91 days per season).");
-         } else if (p[1].equalsIgnoreCase("set")) {
-            if (p.length < 3) {
-               return List.of("[Even Better Moon & Sun] Usage: /year set <days>");
-            } else {
-               try {
-                  int days = Integer.parseInt(p[2]);
-                  if (days < 8) {
-                     return List.of("[Even Better Moon & Sun] Year length must be at least 8 days.");
-                  } else {
-                     cfg.yearLength = days;
-                     cfg.save();
-                     return List.of("[Even Better Moon & Sun] Year length set to " + days + " days (" + days / 4 + " days per season).");
-                  }
-               } catch (NumberFormatException var3) {
-                  return List.of("[Even Better Moon & Sun] Not a number. Usage: /year set <days>");
-               }
-            }
-         } else {
-            return List.of("[Even Better Moon & Sun] Usage: /year set <days>  |  /year reset");
-         }
-      }
+      // Gameoverse: the year follows the real calendar, so its length isn't settable.
+      return List.of("[Even Better Moon & Sun] The year follows the real calendar on this server.");
    }
 
    private static List<String> aurora(String[] p) {
@@ -198,19 +171,19 @@ public final class SkyCommandHandler {
       if (mc.level == null) {
          return List.of("[Even Better Moon & Sun] No world loaded.");
       } else {
-         long ticks = mc.level.getGameTime();
+         long ticks = com.arnav.evenbettermoon.SkyTime.ticks(mc.level);
          long totalDays = ticks / 24000L;
-         int yearLength = SkyEventConfig.get().yearLength;
+         int yearLength = 365;
          int seasonLength = yearLength / 4;
-         int dayOfYear = (int)(totalDays % yearLength);
-         int lunarDay = (int)(totalDays % 29L);
+         int dayOfYear = com.arnav.evenbettermoon.SkyTime.dayOfYear();
+         int lunarDay = com.arnav.evenbettermoon.SkyTime.lunarDay();
          String season = dayOfYear < seasonLength ? "Spring" : (dayOfYear < seasonLength * 2 ? "Summer" : (dayOfYear < seasonLength * 3 ? "Autumn" : "Winter"));
          int bm = SkyEventManager.daysUntilNextBloodMoon(ticks);
          int ec = SkyEventManager.daysUntilNextEclipse(ticks);
          int ms = SkyEventManager.daysUntilNextMeteorShower(ticks);
          boolean auroraTonight = SkyEventManager.isAuroraActiveTonight(ticks);
          return List.of(
-            "[Even Better Moon & Sun] Day " + totalDays + "  |  " + season + "  |  Lunar day " + (lunarDay + 1) + " / 29",
+            "[Even Better Moon & Sun] " + java.time.LocalDate.now() + "  |  " + season + "  |  Lunar day " + (lunarDay + 1) + " / 29",
             "  Blood moon:    " + countdown(bm),
             "  Solar eclipse: " + countdown(ec),
             "  Meteor shower: " + countdown(ms),

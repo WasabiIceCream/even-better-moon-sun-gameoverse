@@ -1,11 +1,12 @@
 {
   "schemaVersion": 1,
   "id": "evenbettermoon",
-  "version": "1.6",
-  "name": "Even Better Moon and Sun",
-  "description": "Realistic lunar cycles (29-day) with all 8 moon phases, and a seasonal sun that shifts its path north/south across the sky throughout the year.",
+  "version": "${version}",
+  "name": "Even Better Moon and Sun (Gameoverse fork)",
+  "description": "Seasonal sun path, moon phases and sky events, following the real calendar and the real moon on the Gameoverse server (with Gameoverse Sky Sync). Fork of Even Better Moon and Sun 1.6 by arnav.",
   "authors": [
-    "arnav"
+    "arnav",
+    "WasabiIceCream (Gameoverse fork)"
   ],
   "environment": "client",
   "entrypoints": {
@@ -22,6 +23,8 @@
   "depends": {
     "fabricloader": ">=0.18.4",
     "minecraft": "~26.1",
-    "java": ">=25"
-  }
+    "java": ">=25",
+    "gameoverse_sky_sync": "*"
+  },
+  "license": "MIT"
 }

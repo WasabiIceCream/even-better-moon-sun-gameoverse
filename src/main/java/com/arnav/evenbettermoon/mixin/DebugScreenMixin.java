@@ -20,12 +20,12 @@ public abstract class DebugScreenMixin {
    private void addAstroInfo(CallbackInfoReturnable<List<String>> cir) {
       Minecraft mc = Minecraft.getInstance();
       if (mc.level != null) {
-         long totalTicks = mc.level.getGameTime();
+         long totalTicks = com.arnav.evenbettermoon.SkyTime.ticks(mc.level);
          long totalDays = totalTicks / 24000L;
-         int yearLength = SkyEventConfig.get().yearLength;
+         int yearLength = 365;
          int seasonLength = yearLength / 4;
-         int dayOfYear = (int)(totalDays % yearLength);
-         int lunarDay = (int)(totalDays % 29L);
+         int dayOfYear = com.arnav.evenbettermoon.SkyTime.dayOfYear();
+         int lunarDay = com.arnav.evenbettermoon.SkyTime.lunarDay();
          String season = getSeason(dayOfYear, seasonLength);
          int dayInSeason = dayOfYear % seasonLength + 1;
          String moonPhase = getMoonPhaseName(lunarDay);
@@ -39,7 +39,7 @@ public abstract class DebugScreenMixin {
          int daysMeteor = SkyEventManager.daysUntilNextMeteorShower(totalTicks);
          List<String> info = new ArrayList<>((Collection<? extends String>)cir.getReturnValue());
          info.add("");
-         info.add("Day " + totalDays + "  |  " + season + " (day " + dayInSeason + ")");
+         info.add(java.time.LocalDate.now() + "  |  " + season + " (day " + dayInSeason + ")");
          info.add("Lunar cycle: " + moonPhase + " (" + (lunarDay + 1) + " / 29)");
          if (eclipse > 0.0F) {
             info.add("Solar Eclipse (" + Math.round(eclipse * 100.0F) + "%)");

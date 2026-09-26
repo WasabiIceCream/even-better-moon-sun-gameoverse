@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class SkyEventConfig {
-   public int bloodMoonInterval = -1;
+   public int bloodMoonInterval = 0;
    public int eclipseInterval = 174;
    public int meteorShowerInterval = 14;
    public int yearLength = 365;
