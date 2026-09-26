@@ -5,25 +5,10 @@ import java.util.Random;
 public final class SkyEventManager {
    public static final int LUNAR_CYCLE = 29;
 
+   // Gameoverse: no timer eclipse. Real solar and lunar eclipses come from the moon's
+   // actual position (Gameoverse Sky Sync) and darken the sky and redden the moon directly.
    public static float eclipseProgress(long totalTicks) {
-      int interval = SkyEventConfig.get().eclipseInterval;
-      if (interval <= 0) {
-         return 0.0F;
-      } else {
-         long day = totalTicks / 24000L;
-         if (day % interval != 0L) {
-            return 0.0F;
-         } else {
-            long tickOfDay = totalTicks % 24000L;
-            long relToNoon = tickOfDay - 6000L;
-            if (Math.abs(relToNoon) > 1500L) {
-               return 0.0F;
-            } else {
-               float t = 1.0F - (float)Math.abs(relToNoon) / 1500.0F;
-               return t * t * t;
-            }
-         }
-      }
+      return 0.0F;
    }
 
    public static float bloodMoonAlpha(long totalTicks) {
@@ -124,17 +109,6 @@ public final class SkyEventManager {
             long rem = day % interval;
             return rem == 0L ? 0 : (int)(interval - rem);
          }
-      }
-   }
-
-   public static int daysUntilNextEclipse(long totalTicks) {
-      int interval = SkyEventConfig.get().eclipseInterval;
-      if (interval <= 0) {
-         return -1;
-      } else {
-         long day = totalTicks / 24000L;
-         long rem = day % interval;
-         return rem == 0L ? 0 : (int)(interval - rem);
       }
    }
 

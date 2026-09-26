@@ -29,8 +29,16 @@ calendar instead, using `gameoverse-sky-sync` (required):
 - **`/year`**: fixed to the real calendar.
 - Aurora animation uses game time instead of the large real-day tick value.
 
-Eclipses (every 174 days), meteor showers (every 14 days) and auroras (peaking at
-the equinoxes) keep their original intervals, counted in real days.
+- **Eclipses**: the original's 174-day timer (a black overlay over the whole screen,
+  HUD included) is gone. Solar and lunar eclipses happen when the real sun and moon
+  line up (maths in `gameoverse-sky-sync`'s `Astronomy`, checked against every
+  2026-27 eclipse). During a solar eclipse the sun fades as it's covered and the sky
+  darkens, with stars out at totality, timed as seen from the eclipse's centre line;
+  during a lunar eclipse the moon dims in Earth's penumbra and turns coppery red in
+  its umbra. `/eclipse` and `/astro` show the next real ones.
+
+Meteor showers (every 14 days) and auroras (peaking at the equinoxes) keep their
+original intervals, counted in real days.
 
 ## Build
 

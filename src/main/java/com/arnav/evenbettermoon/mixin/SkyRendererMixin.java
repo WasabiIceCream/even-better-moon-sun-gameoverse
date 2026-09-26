@@ -14,6 +14,9 @@ import net.minecraft.world.level.dimension.DimensionType.Skybox;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.joml.Vector4f;
+import org.joml.Vector4fc;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SkyRenderer.class)
@@ -48,6 +51,43 @@ public abstract class SkyRendererMixin {
       if (inOverworld()) {
          poseStack.mulPose(Axis.ZP.rotationDegrees((float)RealSky.moonDeclination()));
       }
+   }
+
+   /** Gameoverse: the sun fades as the moon covers it during a solar eclipse. */
+   @ModifyArg(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SkyRenderer;renderSun(FLcom/mojang/blaze3d/vertex/PoseStack;)V"), index = 0)
+   private float eclipseSun(float alpha) {
+      return inOverworld() ? alpha * (float)(1.0 - RealSky.solarCoverage()) : alpha;
+   }
+
+   /**
+    * Gameoverse: the moon dims in Earth's penumbra and turns a dim coppery red in its
+    * umbra during a lunar eclipse, deepest at totality.
+    */
+   @ModifyArg(method = "renderMoon", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/DynamicUniforms;writeTransform(Lorg/joml/Matrix4fc;Lorg/joml/Vector4fc;Lorg/joml/Vector3fc;Lorg/joml/Matrix4fc;)Lcom/mojang/blaze3d/buffers/GpuBufferSlice;"), index = 1)
+   private Vector4fc eclipseMoon(Vector4fc color) {
+      if (!inOverworld()) {
+         return color;
+      }
+      double umbral = RealSky.umbralMagnitude();
+      double penumbral = RealSky.penumbralMagnitude();
+      if (penumbral <= 0) {
+         return color;
+      }
+      float r = 1, g = 1, b = 1;
+      float dim = (float)(1 - 0.25 * Math.min(1, penumbral));
+      if (umbral > 0) {
+         float t = (float)Math.min(1, umbral);
+         r = lerp(dim, 0.62F, t);
+         g = lerp(dim, 0.24F, t);
+         b = lerp(dim, 0.16F, t);
+      } else {
+         r = g = b = dim;
+      }
+      return new Vector4f(color.x() * r, color.y() * g, color.z() * b, color.w());
+   }
+
+   private static float lerp(float from, float to, float t) {
+      return from + (to - from) * t;
    }
 
    private static boolean inOverworld() {

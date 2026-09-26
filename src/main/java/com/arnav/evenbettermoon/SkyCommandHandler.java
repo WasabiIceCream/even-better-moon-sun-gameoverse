@@ -1,6 +1,7 @@
 package com.arnav.evenbettermoon;
 
 import java.util.List;
+import net.gameoverse.skysync.RealSky;
 import net.minecraft.client.Minecraft;
 
 public final class SkyCommandHandler {
@@ -26,37 +27,20 @@ public final class SkyCommandHandler {
    }
 
    private static List<String> eclipse(String[] p) {
-      if (p.length < 2) {
-         return List.of("[Even Better Moon & Sun] Usage: /eclipse set <days>  |  /eclipse reset");
-      } else {
-         SkyEventConfig cfg = SkyEventConfig.get();
-         if (p[1].equalsIgnoreCase("reset")) {
-            cfg.eclipseInterval = 174;
-            cfg.save();
-            return List.of("[Even Better Moon & Sun] Eclipse interval reset to 174 days.");
-         } else if (p[1].equalsIgnoreCase("set")) {
-            if (p.length < 3) {
-               return List.of("[Even Better Moon & Sun] Usage: /eclipse set <days>");
-            } else {
-               try {
-                  int days = Integer.parseInt(p[2]);
-                  if (days < 0) {
-                     return List.of("[Even Better Moon & Sun] Days must be >= 0 (0 = disable).");
-                  } else {
-                     cfg.eclipseInterval = days;
-                     cfg.save();
-                     return List.of(
-                        days == 0 ? "[Even Better Moon & Sun] Solar eclipse disabled." : "[Even Better Moon & Sun] Eclipse: every " + days + " days."
-                     );
-                  }
-               } catch (NumberFormatException var3) {
-                  return List.of("[Even Better Moon & Sun] Not a number. Usage: /eclipse set <days>");
-               }
-            }
-         } else {
-            return List.of("[Even Better Moon & Sun] Usage: /eclipse set <days>  |  /eclipse reset");
-         }
+      // Gameoverse: eclipses follow the real sun and moon, so there's nothing to set.
+      return List.of(PRE + "Solar eclipse: " + describe(RealSky.nextSolarEclipse()),
+         PRE + "Lunar eclipse: " + describe(RealSky.nextLunarEclipse()));
+   }
+
+   private static String describe(RealSky.Eclipse e) {
+      if (e == null) {
+         return "none in the next year";
       }
+      String when = java.time.Instant.ofEpochMilli(e.peakMs()).atZone(java.time.ZoneId.systemDefault())
+         .format(java.time.format.DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a"));
+      long now = RealSky.now();
+      String status = e.peakMs() - now < 3 * 3_600_000L && now - e.peakMs() < 3 * 3_600_000L ? "under way now, " : "";
+      return status + e.kind() + ", peaks " + when;
    }
 
    private static List<String> bloodmoon(String[] p) {
@@ -179,13 +163,13 @@ public final class SkyCommandHandler {
          int lunarDay = com.arnav.evenbettermoon.SkyTime.lunarDay();
          String season = dayOfYear < seasonLength ? "Spring" : (dayOfYear < seasonLength * 2 ? "Summer" : (dayOfYear < seasonLength * 3 ? "Autumn" : "Winter"));
          int bm = SkyEventManager.daysUntilNextBloodMoon(ticks);
-         int ec = SkyEventManager.daysUntilNextEclipse(ticks);
          int ms = SkyEventManager.daysUntilNextMeteorShower(ticks);
          boolean auroraTonight = SkyEventManager.isAuroraActiveTonight(ticks);
          return List.of(
             "[Even Better Moon & Sun] " + java.time.LocalDate.now() + "  |  " + season + "  |  Lunar day " + (lunarDay + 1) + " / 29",
             "  Blood moon:    " + countdown(bm),
-            "  Solar eclipse: " + countdown(ec),
+            "  Solar eclipse: " + describe(RealSky.nextSolarEclipse()),
+            "  Lunar eclipse: " + describe(RealSky.nextLunarEclipse()),
             "  Meteor shower: " + countdown(ms),
             "  Aurora tonight: " + (SkyEventConfig.get().auroraIntensityMultiplier <= 0.0 ? "disabled" : (auroraTonight ? "yes" : "no"))
          );
