@@ -12,7 +12,14 @@ calendar instead, using `gameoverse-sky-sync` (required):
 
 - **Moon phase**: no override. Sky Sync already drives vanilla's moon phase from the
   real moon on both sides, so the sky matches server mechanics.
-- **Sun tilt**: the real solar declination for today.
+- **Sun tilt**: the real solar declination for today, on the sun only (the original
+  tilted the moon and stars with it).
+- **Moon position**: follows the real moon instead of sitting opposite the sun. It
+  trails the sun by its elongation (a new moon rises with the sun, first quarter at
+  noon, full moon at sunset, last quarter at midnight, about 50 minutes later each
+  real day), stays up as long as its own declination allows at the server's latitude,
+  and its arc tilts by that declination (a winter full moon rides high, a summer one
+  low). Shader packs that draw their own moon may still put it opposite the sun.
 - **Year, seasons and the lunar day** for events and `/astro`: the real date,
   with the year starting at the March equinox. The time of day for night-only
   events is the world's, warped to today's daylight length like the sun.
