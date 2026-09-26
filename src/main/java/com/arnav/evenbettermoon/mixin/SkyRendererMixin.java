@@ -18,7 +18,7 @@ public abstract class SkyRendererMixin {
    // Gameoverse: no lunar-cycle override. Gameoverse Sky Sync already drives the vanilla
    // moon phase from the real moon on both sides, so the sky and the server agree.
 
-   @Inject(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose:()V", ordinal = 1))
+   @Inject(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", ordinal = 1))
    private void addSeasonalDeclination(PoseStack poseStack, float f1, float f2, float f3, MoonPhase moonPhase, float f4, float f5, CallbackInfo ci) {
       Minecraft mc = Minecraft.getInstance();
       if (mc.level != null && mc.level.dimension().equals(Level.OVERWORLD)) {

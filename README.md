@@ -35,3 +35,8 @@ The original's F3 lines are dropped: its `DebugScreenMixin` targets
 `DebugScreenOverlay.getGameInformation`, which 26.1.2 no longer has (F3 moved to
 debug entries), and the failed injection crashed the client at startup. The
 original 1.6 jar crashes the same way on 26.1.2. `/astro` shows the same info.
+
+The original's sun-tilt mixin targets `PoseStack;pushPose:()V`, a stray colon that
+isn't valid descriptor syntax (it's in the Modrinth jar too, not a decompiler
+artifact). Mixin rejected it, SkyRenderer failed to transform, and the client showed
+only a black screen from the main menu on. Fixed to `pushPose()V` in 1.6+gameoverse.3.
