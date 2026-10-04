@@ -42,10 +42,10 @@ import org.slf4j.LoggerFactory;
 public final class SkyEffects {
    private static final Logger LOGGER = LoggerFactory.getLogger("evenbettermoon");
    private static final float RADIUS = 100.0F;
-   private static final int GREEN = 0x33FFAA;
-   private static final int TEAL = 0x40E8C0;
-   private static final int VIOLET = 0x9A33FF;
-   private static final ByteBufferBuilder BYTES = new ByteBufferBuilder(1 << 16);
+   private static final int GREEN = 0x3DFF8C;
+   private static final int TEAL = 0x2EE6A0;
+   private static final int VIOLET = 0x8A4DFF;
+   private static final ByteBufferBuilder BYTES = new ByteBufferBuilder(1 << 18);
    private static RenderPipeline pipeline;
 
    private SkyEffects() {
@@ -136,53 +136,74 @@ public final class SkyEffects {
 
    // ---------------------------------------------------------------- aurora
 
-   /** Curtains over the northern horizon: green at the foot, violet fading out at the top, gently waving. */
+   /**
+    * Curtains over the northern horizon: one long main arc and up to two fainter ones, each a row of thin vertical
+    * rays of varying brightness and height that drift sideways, with a soft foot, a bright green lower edge fading
+    * into violet at the ray tips, and folds from two overlapping waves.
+    */
    private static int aurora(BufferBuilder b, long day, float anim, float intensity) {
       int written = 0;
-      int columns = 40;
-      for (int band = 0; band < 4; band++) {
+      Random night = new Random(day * 4801L + 1123L);
+      int bands = 1 + night.nextInt(3);
+      for (int band = 0; band < bands; band++) {
          Random rng = new Random(day * 4801L + band * 733L + 1123L);
-         float centre = (float)Math.toRadians(-70.0 + band * 47.0 + (rng.nextFloat() - 0.5F) * 20.0F);
-         float span = (float)Math.toRadians(30.0 + rng.nextFloat() * 25.0);
-         float baseElevation = (float)Math.toRadians(8.0 + rng.nextFloat() * 10.0);
-         float height = (float)Math.toRadians(18.0 + rng.nextFloat() * 14.0);
-         float speed = 0.004F + rng.nextFloat() * 0.004F;
+         boolean main = band == 0;
+         float centre = (float)Math.toRadians(main ? (rng.nextFloat() - 0.5F) * 30.0F : (rng.nextFloat() - 0.5F) * 120.0F);
+         float span = (float)Math.toRadians(main ? 100.0 + rng.nextFloat() * 40.0 : 50.0 + rng.nextFloat() * 40.0);
+         float footElevation = (float)Math.toRadians((main ? 10.0 : 16.0) + rng.nextFloat() * 8.0);
+         float height = (float)Math.toRadians((main ? 22.0 : 14.0) + rng.nextFloat() * 14.0);
+         float speed = 0.003F + rng.nextFloat() * 0.003F;
          float phase = rng.nextFloat() * (float)(Math.PI * 2);
-         float hueShift = (rng.nextFloat() - 0.5F) * 0.2F;
-         float strength = intensity * (0.6F + 0.4F * rng.nextFloat()) * 0.75F;
+         float strength = intensity * (main ? 0.9F : 0.55F) * (0.7F + 0.3F * rng.nextFloat());
+         int columns = main ? 180 : 110;
 
          float[] az = new float[columns + 1];
          float[] foot = new float[columns + 1];
-         float[] mid = new float[columns + 1];
          float[] top = new float[columns + 1];
-         int[] alpha = new int[columns + 1];
+         float[] ray = new float[columns + 1];
          for (int i = 0; i <= columns; i++) {
             float t = (float)i / columns;
-            float wave = (float)Math.sin(t * 6.0F + anim * speed + phase);
-            az[i] = centre + (t - 0.5F) * span + (float)Math.toRadians(4.0) * wave;
-            foot[i] = baseElevation + (float)Math.toRadians(2.0) * (float)Math.sin(t * 3.0F + anim * speed * 0.5F + phase * 2.0F);
-            top[i] = foot[i] + height * (0.75F + 0.25F * (float)Math.sin(t * 5.0F + anim * speed * 1.3F + phase * 3.0F));
-            mid[i] = foot[i] + (top[i] - foot[i]) * 0.35F;
-            float edge = (float)Math.sin(Math.PI * t);
-            float shimmer = 0.7F + 0.3F * (float)Math.sin(anim * 0.05F + t * 10.0F + band);
-            alpha[i] = Math.min(255, Math.round(strength * edge * shimmer * 255.0F));
+            // Folds: two waves of different length moving at different speeds
+            float fold = (float)Math.sin(t * 8.2F + anim * speed + phase) * 0.6F
+               + (float)Math.sin(t * 21.0F - anim * speed * 1.7F + phase * 2.3F) * 0.4F;
+            az[i] = centre + (t - 0.5F) * span + (float)Math.toRadians(5.0) * fold;
+            foot[i] = footElevation + (float)Math.toRadians(2.5) * (float)Math.sin(t * 4.0F + anim * speed * 0.6F + phase * 1.7F);
+            // Rays: narrow bright streaks drifting slowly sideways, each with its own height
+            float r1 = 0.5F + 0.5F * (float)Math.sin(t * 157.0F + anim * 0.011F + phase);
+            float r2 = 0.5F + 0.5F * (float)Math.sin(t * 61.0F - anim * 0.007F + phase * 3.1F);
+            float r3 = 0.5F + 0.5F * (float)Math.sin(t * 23.0F + anim * 0.004F);
+            float rays = r1 * r1 * 0.55F + r2 * 0.3F + r3 * 0.15F;
+            ray[i] = rays;
+            top[i] = foot[i] + height * (0.45F + 0.55F * rays);
+            float edge = (float)Math.pow(Math.sin(Math.PI * t), 0.6);
+            float shimmer = 0.8F + 0.2F * (float)Math.sin(anim * 0.04F + t * 13.0F + band);
+            ray[i] = strength * edge * shimmer * (0.35F + 0.65F * rays);
          }
-         int footColour = mix(GREEN, TEAL, 0.5F + hueShift);
-         int midColour = mix(TEAL, VIOLET, 0.35F + hueShift);
+         float below = (float)Math.toRadians(1.8);
          for (int i = 0; i < columns; i++) {
-            if (alpha[i] == 0 && alpha[i + 1] == 0) {
+            int a0 = Math.min(255, Math.round(ray[i] * 255.0F));
+            int a1 = Math.min(255, Math.round(ray[i + 1] * 255.0F));
+            if (a0 == 0 && a1 == 0) {
                continue;
             }
-            // foot to middle: bright
+            float mid0 = foot[i] + (top[i] - foot[i]) * 0.3F;
+            float mid1 = foot[i + 1] + (top[i + 1] - foot[i + 1]) * 0.3F;
+            // soft foot: fades in from just below the lower edge
             written += quad(b,
-               az[i], foot[i], footColour, alpha[i],
-               az[i + 1], foot[i + 1], footColour, alpha[i + 1],
-               az[i + 1], mid[i + 1], midColour, alpha[i + 1],
-               az[i], mid[i], midColour, alpha[i]);
-            // middle to top: fading into violet
+               az[i], foot[i] - below, GREEN, 0,
+               az[i + 1], foot[i + 1] - below, GREEN, 0,
+               az[i + 1], foot[i + 1], GREEN, a1,
+               az[i], foot[i], GREEN, a0);
+            // bright green band
             written += quad(b,
-               az[i], mid[i], midColour, alpha[i],
-               az[i + 1], mid[i + 1], midColour, alpha[i + 1],
+               az[i], foot[i], GREEN, a0,
+               az[i + 1], foot[i + 1], GREEN, a1,
+               az[i + 1], mid1, TEAL, a1 * 3 / 4,
+               az[i], mid0, TEAL, a0 * 3 / 4);
+            // rays fading into violet
+            written += quad(b,
+               az[i], mid0, TEAL, a0 * 3 / 4,
+               az[i + 1], mid1, TEAL, a1 * 3 / 4,
                az[i + 1], top[i + 1], VIOLET, 0,
                az[i], top[i], VIOLET, 0);
          }
@@ -206,14 +227,6 @@ public final class SkyEffects {
       float cos = (float)Math.cos(elevation);
       b.addVertex(RADIUS * cos * (float)Math.sin(azimuth), RADIUS * (float)Math.sin(elevation), -RADIUS * cos * (float)Math.cos(azimuth))
          .setColor(rgb >> 16 & 0xFF, rgb >> 8 & 0xFF, rgb & 0xFF, alpha);
-   }
-
-   private static int mix(int a, int b, float t) {
-      t = Math.max(0.0F, Math.min(1.0F, t));
-      int r = Math.round((a >> 16 & 0xFF) + ((b >> 16 & 0xFF) - (a >> 16 & 0xFF)) * t);
-      int g = Math.round((a >> 8 & 0xFF) + ((b >> 8 & 0xFF) - (a >> 8 & 0xFF)) * t);
-      int bl = Math.round((a & 0xFF) + ((b & 0xFF) - (a & 0xFF)) * t);
-      return r << 16 | g << 8 | bl;
    }
 
    // ------------------------------------------------- meteors and shooting stars
