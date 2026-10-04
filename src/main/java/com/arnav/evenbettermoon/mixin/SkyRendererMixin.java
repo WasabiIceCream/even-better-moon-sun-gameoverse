@@ -37,6 +37,16 @@ public abstract class SkyRendererMixin {
       }
    }
 
+   /**
+    * Gameoverse: the aurora, meteor showers and shooting stars are drawn here, in the sky, before any celestial
+    * rotation (so they stay fixed in the world) and before terrain (so terrain covers them). The last parameter is
+    * the stars' brightness, which they fade with. See SkyEffects.
+    */
+   @Inject(method = "renderSunMoonAndStars", at = @At("HEAD"))
+   private void skyEffects(PoseStack poseStack, float sunAngle, float moonAngle, float starAngle, MoonPhase moonPhase, float sunMoonAlpha, float starBrightness, CallbackInfo ci) {
+      com.arnav.evenbettermoon.SkyEffects.render(poseStack, starBrightness);
+   }
+
    /** Tilts the sun's arc north or south by today's solar declination (sun only). */
    @Inject(method = "renderSunMoonAndStars", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", ordinal = 1, shift = At.Shift.AFTER))
    private void addSeasonalDeclination(PoseStack poseStack, float f1, float f2, float f3, MoonPhase moonPhase, float f4, float f5, CallbackInfo ci) {

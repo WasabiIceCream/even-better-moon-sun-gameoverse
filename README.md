@@ -58,3 +58,13 @@ The original's sun-tilt mixin targets `PoseStack;pushPose:()V`, a stray colon th
 isn't valid descriptor syntax (it's in the Modrinth jar too, not a decompiler
 artifact). Mixin rejected it, SkyRenderer failed to transform, and the client showed
 only a black screen from the main menu on. Fixed to `pushPose()V` in 1.6+gameoverse.3.
+
+## Aurora, meteors and shooting stars in the sky (gameoverse.8, 2026-10-04)
+
+The original drew these as flat 2D layers over the finished frame (`Gui`), so they covered walls and terrain and
+stayed fixed to the camera. `SkyEffects` now draws them as geometry on the sky sphere from
+`SkyRenderer.renderSunMoonAndStars` (before any celestial rotation and before terrain, like vanilla's sunrise glow):
+the aurora hangs as waving curtains over the northern horizon, green at the foot fading into violet, meteors and
+shooting stars are thin streaks; all fade with the stars (dusk, dawn, rain). Same schedules as before. The pipeline
+(position-color triangles, additive blend) is assigned to Iris's `SKY_BASIC` program when a shader pack is on.
+The eclipse darkening and the (off by default) harvest/blood moon tints are still screen fills.
